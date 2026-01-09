@@ -28,6 +28,12 @@
             </svg>
             <span><?= $fileCount ?></span>
         </button>
+
+        <footer class="footer">
+            <a href="https://brnt.cz" target="_blank" rel="noopener">
+                <img src="./brnt-logo-w.png" alt="brnt.cz">
+            </a>
+        </footer>
     </div>
 
     <script src="app.js?v=1"></script>
