@@ -1,0 +1,9 @@
+# Nahrané soubory (kromě index.php)
+/data/*
+!/data/index.php
+
+# IDE
+/.idea/
+
+# Playwright
+/.playwright-mcp/
