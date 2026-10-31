@@ -21,6 +21,8 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           SOURCE: "./"
           TARGET: "/www/up/"
-          EXCLUDE: ".git, .github, .claude, .idea, .playwright-mcp"
+          # data/ drzi nahrane soubory, v repu je z nej jen index.php.
+          # Bez teto vyjimky se je --delete pokusi smazat pri kazdem deploji.
+          EXCLUDE: ".git, .github, .claude, .idea, .playwright-mcp, data"
           ARGS: "-rltz --delete --omit-dir-times"
           REMOTE_PORT: 53022

@@ -1,10 +1,11 @@
 <div class="card">
     <form enctype="multipart/form-data" id="uploadForm" action="" method="post">
         <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
-        <input type="hidden" name="MAX_FILE_SIZE" value="<?= MAX_FILE_SIZE ?>">
+        <input type="hidden" name="MAX_FILE_SIZE" value="<?= maxUploadBytes() ?>">
         <input type="hidden" name="upload" value="1">
 
-        <div class="dropzone" id="dropzone">
+        <div class="dropzone" id="dropzone" data-max-size="<?= maxUploadBytes() ?>"
+             data-too-large="<?= esc(t('msg_file_too_large', maxUploadMb())) ?>">
             <input type="file" name="file" id="fileInput">
             <div class="dropzone-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -14,7 +15,7 @@
                 </svg>
             </div>
             <p class="dropzone-text"><?= t('dropzone_text') ?></p>
-            <p class="dropzone-hint"><?= t('dropzone_hint', (int) round(MAX_FILE_SIZE / 1024 / 1024)) ?></p>
+            <p class="dropzone-hint"><?= t('dropzone_hint', maxUploadMb()) ?></p>
         </div>
 
         <div class="selected-file" id="selectedFile">

@@ -414,6 +414,10 @@ body {
   color: var(--color-text-muted);
 }
 
+.selected-file-size.is-error {
+  color: var(--color-error);
+}
+
 .selected-file-remove {
   width: 28px;
   height: 28px;

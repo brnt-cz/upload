@@ -55,6 +55,86 @@ function redirect(string $url = ''): void {
 }
 
 // =============================================================================
+// Limity uploadu
+// =============================================================================
+
+/**
+ * Převede zkrácený zápis PHP direktivy ("16M") na bajty.
+ */
+function parseIniBytes(string $value): int {
+    $value = trim($value);
+
+    if ($value === '') {
+        return 0;
+    }
+
+    $number = (int) $value;
+
+    return match (strtolower(substr($value, -1))) {
+        'g' => $number * 1024 * 1024 * 1024,
+        'm' => $number * 1024 * 1024,
+        'k' => $number * 1024,
+        default => $number,
+    };
+}
+
+/**
+ * Skutečný strop uploadu v bajtech.
+ *
+ * Nejnižší ze tří limitů: náš MAX_FILE_SIZE a PHP direktivy upload_max_filesize
+ * a post_max_size. Dokud se aplikace ptala jen na MAX_FILE_SIZE, slibovala
+ * 15 MB tam, kde PHP pouštělo 2 MB, a soubor zahodilo dřív, než se k naší
+ * kontrole vůbec dostal. (BRNT-6)
+ */
+function maxUploadBytes(): int {
+    $limits = [MAX_FILE_SIZE];
+
+    foreach (['upload_max_filesize', 'post_max_size'] as $directive) {
+        $bytes = parseIniBytes((string) ini_get($directive));
+
+        // Nula i -1 znamenají "bez limitu", ty strop nesnižují.
+        if ($bytes > 0) {
+            $limits[] = $bytes;
+        }
+    }
+
+    return min($limits);
+}
+
+/**
+ * Strop uploadu zaokrouhlený dolů na celé MB, pro hlášky a popisky.
+ */
+function maxUploadMb(): int {
+    return (int) floor(maxUploadBytes() / 1024 / 1024);
+}
+
+/**
+ * Pozná požadavek utnutý na post_max_size.
+ *
+ * Nad tímhle limitem PHP zahodí $_POST i $_FILES, takže by jako první selhala
+ * kontrola CSRF a uživatel by dostal hlášku o tokenu místo o velikosti. (BRNT-6)
+ */
+function isPostTooLarge(): bool {
+    if ($_POST !== [] || $_FILES !== []) {
+        return false;
+    }
+
+    return (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0;
+}
+
+/**
+ * Přeloží kód chyby uploadu na hlášku, která uživateli řekne, co má dělat.
+ */
+function uploadErrorMessage(int $error): string {
+    return match ($error) {
+        UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => t('msg_file_too_large', maxUploadMb()),
+        UPLOAD_ERR_PARTIAL => t('msg_upload_partial'),
+        UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE, UPLOAD_ERR_EXTENSION => t('msg_upload_server_error'),
+        default => t('msg_upload_error', $error),
+    };
+}
+
+// =============================================================================
 // Validace souborů
 // =============================================================================
 
@@ -144,7 +224,7 @@ function handleUpload(): void {
     }
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        setFlashMessage(t('msg_upload_error', $file['error']));
+        setFlashMessage(uploadErrorMessage((int) $file['error']));
         redirect();
         return;
     }
@@ -158,8 +238,8 @@ function handleUpload(): void {
         return;
     }
 
-    if ($file['size'] > MAX_FILE_SIZE) {
-        setFlashMessage(t('msg_file_too_large', (int) round(MAX_FILE_SIZE / 1024 / 1024)));
+    if ($file['size'] > maxUploadBytes()) {
+        setFlashMessage(t('msg_file_too_large', maxUploadMb()));
         redirect();
         return;
     }

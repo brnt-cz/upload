@@ -28,6 +28,8 @@ return [
     'msg_csrf_invalid' => 'Neplatný CSRF token. Zkuste to znovu.',
     'msg_no_file' => 'Nebyl vybrán žádný soubor k uploadu.',
     'msg_upload_error' => 'Chyba při nahrávání souboru. Kód: %d',
+    'msg_upload_partial' => 'Soubor se nahrál jen částečně. Zkuste to prosím znovu.',
+    'msg_upload_server_error' => 'Soubor se nepodařilo uložit na serveru. Zkuste to prosím znovu.',
     'msg_invalid_filename' => 'Neplatný název souboru.',
     'msg_file_too_large' => 'Soubor je příliš velký. Maximum je %d MB.',
     'msg_file_exists' => 'Soubor <strong>%s</strong> již existuje.',

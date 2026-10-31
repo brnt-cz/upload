@@ -3,3 +3,14 @@ RewriteBase /
 RewriteCond %{SCRIPT_FILENAME} !-f
 RewriteCond %{SCRIPT_FILENAME} !-d
 RewriteRule ^(.*)$ $1.html [NC,L]
+
+# PHP na Pi má globálně upload_max_filesize 2M a post_max_size 8M, takže soubor
+# zahodilo dřív, než se k němu dostala kontrola MAX_FILE_SIZE z config.php.
+# Limity musí být nad ní, post_max_size navíc nese i zbytek formuláře. (BRNT-6)
+<IfModule php_module>
+    php_value upload_max_filesize 16M
+    php_value post_max_size 18M
+    # Patnáctimegový soubor po pomalé lince nemusí dorazit do výchozích 60 s
+    # a max_input_time běží už během příjmu těla požadavku.
+    php_value max_input_time 300
+</IfModule>
