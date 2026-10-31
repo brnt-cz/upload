@@ -47,6 +47,13 @@ A simple and secure PHP application for uploading and managing files.
 | `BLOCKED_EXTENSIONS` | *array* | File extensions that cannot be uploaded |
 | `EXCLUDED_FILES` | `['.', '..', 'index.php']` | Files excluded from listing |
 
+The effective limit is the lowest of `MAX_FILE_SIZE`, `upload_max_filesize` and
+`post_max_size`. PHP rejects an oversized upload before the application ever
+sees it, so raising `MAX_FILE_SIZE` alone has no effect. The `.htaccess` file
+raises both PHP directives above `MAX_FILE_SIZE`; it needs `mod_php` and
+`AllowOverride All`. Under PHP-FPM, set the directives in the pool config
+instead.
+
 ### Blocked File Extensions
 
 Scripts and executable files are blocked by default:

@@ -28,6 +28,8 @@ return [
     'msg_csrf_invalid' => 'Invalid CSRF token. Please try again.',
     'msg_no_file' => 'No file was selected for upload.',
     'msg_upload_error' => 'Error uploading file. Code: %d',
+    'msg_upload_partial' => 'The file was only partially uploaded. Please try again.',
+    'msg_upload_server_error' => 'The file could not be stored on the server. Please try again.',
     'msg_invalid_filename' => 'Invalid file name.',
     'msg_file_too_large' => 'File is too large. Maximum is %d MB.',
     'msg_file_exists' => 'File <strong>%s</strong> already exists.',

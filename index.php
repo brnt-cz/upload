@@ -12,7 +12,10 @@ require_once __DIR__ . '/functions.php';
 
 // Zpracování POST požadavků
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['upload'])) {
+    if (isPostTooLarge()) {
+        setFlashMessage(t('msg_file_too_large', maxUploadMb()));
+        redirect();
+    } elseif (isset($_POST['upload'])) {
         handleUpload();
     } elseif (isset($_POST['delete'])) {
         handleDelete();

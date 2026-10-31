@@ -48,13 +48,24 @@
     // File Upload / Dropzone
     // ==========================================================================
 
+    // Soubor nad limit server stejně odmítne, ale až po nahrání celého těla
+    // požadavku. Na mobilní lince je to několik minut čekání na chybu, kterou
+    // jde poznat hned po výběru souboru. (BRNT-6)
+    const maxUploadSize = parseInt(dropzone.dataset.maxSize || '0', 10);
+    const tooLargeText = dropzone.dataset.tooLarge || '';
+
     function updateFileDisplay(file) {
         if (file) {
+            const tooLarge = maxUploadSize > 0 && file.size > maxUploadSize;
             fileName.textContent = file.name;
-            fileSize.textContent = formatSize(file.size);
+            fileSize.textContent = tooLarge
+                ? formatSize(file.size) + ' · ' + tooLargeText
+                : formatSize(file.size);
+            fileSize.classList.toggle('is-error', tooLarge);
             selectedFile.classList.add('show');
-            uploadBtn.disabled = false;
+            uploadBtn.disabled = tooLarge;
         } else {
+            fileSize.classList.remove('is-error');
             selectedFile.classList.remove('show');
             uploadBtn.disabled = true;
         }
